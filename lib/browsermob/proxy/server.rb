@@ -17,7 +17,14 @@ module BrowserMob
       # @option opts [Integer] timeout Seconds to wait for server to launch before timing out.
       #
 
-      def initialize(path, opts = {})
+      def initialize(path = nil, opts = {})
+        if path.is_a?(Hash) && opts.is_a?(Hash) && opts.empty?
+          opts = path
+          path = nil
+        end
+
+        path = File.join root_path, 'bin/browsermob-proxy' if path.nil?
+
         assert_executable path
 
         @path    = path
@@ -98,6 +105,10 @@ module BrowserMob
         unless File.executable?(path)
           raise Errno::EACCES, "not executable: #{path}"
         end
+      end
+
+      def root_path
+        File.expand_path('../../../..', __FILE__)
       end
 
       class TimeoutError < StandardError
